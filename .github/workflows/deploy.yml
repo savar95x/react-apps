@@ -1,0 +1,70 @@
+name: Deploy Tools
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # --------------------------------------------------------
+      # BUILD STEP: WEATHER APP
+      # --------------------------------------------------------
+      - name: Build Weather App
+        run: |
+          cd weather-app
+          npm ci
+          npm run build
+          # This usually creates weather-app/dist
+
+      # --------------------------------------------------------
+      # BUILD STEP: CALCULATOR
+      # --------------------------------------------------------
+      - name: Build Calculator
+        run: |
+          cd calculator
+          npm ci
+          npm run build 
+          # This usually creates calculator/dist
+
+      # --------------------------------------------------------
+      # MERGE BUILDS
+      # --------------------------------------------------------
+      - name: Prepare Deployment Folder
+        run: |
+          mkdir _site
+          # Copy the main landing page if you have one
+          #cp index.html _site/ 
+          
+          # Move app builds into their subfolders in _site
+          mkdir -p _site/weather-app
+          cp -r weather-app/dist/* _site/weather-app/
+          
+          mkdir -p _site/calculator
+          cp -r calculator/dist/* _site/calculator/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
