@@ -10,11 +10,11 @@
     },
     {
       "source": "/breathe",
-      "destination": "https://breathe-app.vercel.app/breathe"
+      "destination": "https://breathe-savar95x.vercel.app/"
     },
     {
       "source": "/breathe/:path*",
-      "destination": "https://breathe-app.vercel.app/breathe/:path*"
+      "destination": "https://breathe-savar95x.vercel.app/breathe/:path*"
     }
   ]
 }
